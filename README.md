@@ -174,13 +174,78 @@ The script provides:
 - Detailed exception logging.
 - Periodic database commits.
 
-## Limitations
+## RTF2HTML Features and Limitations
 
-- Designed for SQL Server compressed RTF data compatible with the `compressed-rtf` Python library.
-- Requires an external RTF2HTML executable.
-- Uses temporary files during conversion.
-- Retrieves matching records into memory before processing, which may require modification for very large datasets.
-- The RTF2HTML executable must support the input and output command-line arguments used by the script.
+This project uses the RTF2HTML Converter (version 0.1 Alpha) as an external command-line utility.
+
+The original converter supports several RTF-to-HTML conversion capabilities. However, the current Python implementation only integrates the core file conversion functionality.
+
+### Currently Implemented
+
+The following functionality is implemented in the Python script:
+
+- **RTF Decompression:** Decompresses SQL Server compressed RTF binary data using the `compressed-rtf` library.
+- **HTML Conversion:** Converts decompressed RTF documents into HTML using `rtf2html.exe`.
+- **Temporary File Management:** Creates temporary RTF and HTML files during conversion.
+- **Database Integration:** Automatically stores generated HTML content in the configured SQL Server destination column.
+- **Batch Processing:** Processes multiple database records and commits successful updates periodically.
+- **Error Handling:** Handles individual conversion failures without terminating the entire processing operation.
+- **Logging:** Records conversion errors and processing information for troubleshooting.
+
+### Available in RTF2HTML but Not Yet Integrated
+
+The original RTF2HTML Converter provides additional functionality that is not currently exposed or implemented in this Python integration.
+
+| Feature | Description | Implementation Status |
+|---|---|---|
+| Image Output Directory | Allows specifying a custom directory for extracted images through an optional third command-line argument. | Not implemented |
+| Image Extraction | Supports outputting images associated with converted RTF documents into a separate directory. | Not integrated |
+| Alternative Output Formats | Original documentation mentions that the generated HTML can be adapted towards XML/XHTML output. | Not implemented |
+| Windows DLL Integration | The converter provides a DLL interface with development headers and sample programs. | Not implemented |
+| Additional RTF Formatting | Supports various formatting features such as capitalization, invisible text, long spaces and hard page breaks. | Handled by the external converter |
+
+**Note:** Some of these capabilities are supported internally by the original executable, but their availability and behaviour depend on the converter version and input document.
+
+### Potential Future Improvements
+
+The following enhancements could extend the functionality of this project:
+
+- [ ] Support a configurable image output directory.
+- [ ] Handle extracted images and associate them with the generated HTML.
+- [ ] Support RTF documents containing embedded images.
+- [ ] Add configurable conversion options.
+- [ ] Improve processing efficiency for large database tables through pagination or key-based batching.
+- [ ] Add more detailed conversion statistics.
+- [ ] Implement validation of generated HTML output.
+- [ ] Investigate alternative conversion engines for improved compatibility with modern RTF documents.
+
+### Known Limitations of the Original Converter
+
+The RTF2HTML Converter version 0.1 Alpha has documented limitations, including:
+
+- Limited conversion of lists into native HTML list elements (`OL`, `UL`, `DL`).
+- Some bullet symbols may not render correctly across different browsers.
+- Incomplete compatibility with certain OpenOffice Writer RTF documents.
+- Limited support for BMP and WMF image conversion.
+- No paragraph border conversion.
+- No table border or table cell size control.
+- No page header or footer conversion.
+- No hyperlink conversion.
+- No automatic generation of HTML heading elements (`H1`, `H2`, etc.).
+
+The original author also notes that version 0.1 Alpha was not thoroughly tested.
+
+These limitations originate from the third-party converter and are not necessarily caused by the Python integration.
+
+For further details, refer to [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+### Important Distinction
+
+The Python script acts as an integration layer between SQL Server, the compressed RTF data, and the external RTF2HTML executable.
+
+It does not independently implement the RTF parsing or HTML rendering functionality.
+
+Consequently, the quality and completeness of the generated HTML depend partly on the capabilities and limitations of the external converter.
 
 ## Technologies Used
 
